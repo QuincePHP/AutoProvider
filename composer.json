@@ -1,15 +1,26 @@
 {
-    "name": "quince/auto-provider",
-    "description": "Automatically register service providers located in app\\Providers for laravel 5",
-    "require": {
-        "illuminate/support": "~5.0"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Behzad Shabani",
-            "email": "behzad.shabani@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev"
+	"name": "quince/auto-provider",
+	"description": "Automatically register service providers located in app\\Providers for laravel 5",
+	"keywords": [
+		"laravel",
+		"service provider",
+		"autoload"
+	],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Behzad Shabani",
+			"email": "behzad.shabani@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.4.0",
+		"illuminate/support": "~5.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Quince\\AutoProvider\\": "src"
+		}
+	},
+	"minimum-stability": "dev"
 }
