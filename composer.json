@@ -2,7 +2,7 @@
     "name": "quince/auto-provider",
     "description": "Automatically register service providers located in app\\Providers for laravel 5",
     "require": {
-        "illuminate/support": "5.*"
+        "illuminate/support": "~5.0"
     },
     "license": "MIT",
     "authors": [
