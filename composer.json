@@ -1,0 +1,15 @@
+{
+    "name": "quince/auto-provider",
+    "description": "Automatically register service providers located in app\\Providers for laravel 5",
+    "require": {
+        "illuminate/support": "5.*"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Behzad Shabani",
+            "email": "behzad.shabani@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
