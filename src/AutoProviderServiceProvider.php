@@ -1,5 +1,6 @@
 <?php namespace Quince\AutoProvider;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 
 class AutoProviderServiceProvider extends ServiceProvider {
@@ -18,7 +19,11 @@ class AutoProviderServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		(new AutoProvider($this->app, $this->app['config']))->run();
+		(new AutoProvider(
+			$this->app,
+			$this->app['config'],
+			new Filesystem()
+		))->run();
 	}
 
 }

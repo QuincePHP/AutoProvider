@@ -1,9 +1,9 @@
-<?php namespace Quince\AutoProvider; 
+<?php namespace Quince\AutoProvider;
 
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\ProviderRepository;
+use Illuminate\Support\ServiceProvider;
 
 class AutoProvider {
 
@@ -23,13 +23,20 @@ class AutoProvider {
 	protected $providers = [];
 
 	/**
+	 * @var Filesystem
+	 */
+	protected $file;
+
+	/**
 	 * @param Application $app
 	 * @param Repository  $config
+	 * @param Filesystem  $file
 	 */
-	public function __construct(Application $app, Repository $config)
+	public function __construct(Application $app, Repository $config, Filesystem $file)
 	{
 		$this->app = $app;
 		$this->config = $config;
+		$this->file = $file;
 	}
 
 	/**
@@ -39,10 +46,7 @@ class AutoProvider {
 	 */
 	public function run()
 	{
-		$manifestPath = $this->app->storagePath().'/framework/services.json';
-
-		(new ProviderRepository($this->app, new Filesystem, $manifestPath))
-			->load($this->getProviders());
+		$this->registerProviders($this->getProviders());
 	}
 
 	/**
@@ -62,6 +66,8 @@ class AutoProvider {
 			}
 		}
 
+		$this->addProvidersToManifest();
+
 		return $this->providers;
 	}
 
@@ -75,7 +81,9 @@ class AutoProvider {
 		$className = $this->guessClassName($filename);
 
 		if (class_exists($className)) {
-			$this->providers[] = $className;
+			if ($this->isAddable($className)) {
+				$this->providers[] = $className;
+			}
 		}
 	}
 
@@ -87,7 +95,100 @@ class AutoProvider {
 	 */
 	protected function guessClassName($filename)
 	{
-		return $this->config->get('auto-provider.app_namespace') . '\\Providers\\' . $filename;
+		return $this->config->get('auto-provider.app_namespace') . '\\' . $this->getProviderFolder() . '\\' . $filename;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	protected function getProviderFolder()
+	{
+		$folder = str_replace(
+			'/',
+			'\\',
+			substr(
+				$this->config->get('auto-provider.providers_folder_path'),
+				strlen(app_path())
+			)
+		);
+
+		return $folder;
+	}
+
+	/**
+	 * @param $className
+	 * @return bool
+	 */
+	protected function isAddable($className)
+	{
+		return !$this->alreadyLoaded($className) && !$this->createProvider($className)->isDeferred();
+	}
+
+	/**
+	 * @param $className
+	 * @return bool
+	 */
+	protected function alreadyLoaded($className)
+	{
+		$manifest = $this->loadManifest();
+
+		return (in_array($className, $manifest['providers']));
+	}
+
+	/**
+	 * @return mixed
+	 */
+	protected function loadManifest()
+	{
+		$manifestPath = $this->getManifestPath();
+
+		if ($this->file->exists($manifestPath)) {
+			return json_decode($this->file->get($manifestPath), true);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function getManifestPath()
+	{
+		return $this->app->storagePath() . '/framework/services.json';
+	}
+
+	/**
+	 * @param $provider
+	 * @return ServiceProvider
+	 */
+	protected function createProvider($provider)
+	{
+		return new $provider($this->app);
+	}
+
+	/**
+	 * Overwrite old manifest with new manifest
+	 */
+	protected function addProvidersToManifest()
+	{
+		$manifest = $this->loadManifest();
+		$manifest['providers'] = array_merge($manifest['providers'], $this->providers);
+		$manifest['eager'] = array_merge($manifest['eager'], $this->providers);
+
+		$this->file->put(
+			$this->getManifestPath(),
+			json_encode($manifest, JSON_PRETTY_PRINT)
+		);
+	}
+
+	/**
+	 * @param $providers
+	 */
+	protected function registerProviders($providers)
+	{
+		foreach ($providers as $provider) {
+			$this->app->register($this->createProvider($provider));
+		}
 	}
 
 }

@@ -1,6 +1,6 @@
 <?php
 
 return [
-	'providers_folder' => 'app/Provider',
-	'app_namespace'    => 'App',
+	'providers_folder_path' => app_path('Providers'),
+	'app_namespace'         => 'App',
 ];
