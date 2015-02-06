@@ -10,12 +10,12 @@ class AutoProvider {
 	/**
 	 * @var Application
 	 */
-	private $app;
+	protected $app;
 
 	/**
 	 * @var Repository
 	 */
-	private $config;
+	protected $config;
 
 	/**
 	 * @var array
@@ -34,6 +34,8 @@ class AutoProvider {
 
 	/**
 	 * Register service providers inside Providers folder
+	 *
+	 * @return void
 	 */
 	public function run()
 	{
@@ -44,9 +46,11 @@ class AutoProvider {
 	}
 
 	/**
+	 * Get list of service providers inside Provider folder
+	 *
 	 * @return array
 	 */
-	private function getProviders()
+	protected function getProviders()
 	{
 		$files = scandir($this->config->get('auto-provider.providers_folder'));
 
@@ -62,9 +66,11 @@ class AutoProvider {
 	}
 
 	/**
+	 * Check for providers existance and add them to provider container
+	 *
 	 * @param $filename
 	 */
-	private function addProvider($filename)
+	protected function addProvider($filename)
 	{
 		$className = $this->guessClassName($filename);
 
@@ -74,10 +80,12 @@ class AutoProvider {
 	}
 
 	/**
+	 * Guess provider class name
+	 *
 	 * @param $filename
-	 * @return mixed
+	 * @return string
 	 */
-	private function guessClassName($filename)
+	protected function guessClassName($filename)
 	{
 		return $this->config->get('auto-provider.app_namespace') . '\\Providers\\' . $filename;
 	}
