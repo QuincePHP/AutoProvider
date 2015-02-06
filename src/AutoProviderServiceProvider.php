@@ -7,7 +7,7 @@ class AutoProviderServiceProvider extends ServiceProvider {
 	public function boot()
 	{
 		$this->publishes([
-			__DIR__ . '/config/config.php' => $this->app->make('path.config') . 'config.php'
+			__DIR__ . '/config/auto-provider.php' => config_path('auto-provider.php')
 		]);
 	}
 
