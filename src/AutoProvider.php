@@ -57,7 +57,9 @@ class AutoProvider {
 	protected function getProviders()
 	{
 		if (!empty($folder = $this->config->get('auto-provider.providers_folder_path'))) {
-			$files = scandir($folder);
+
+			//List of all files in directory
+			$files = $this->file->files($folder);
 
 			foreach ($files as $file) {
 				$fileInfo = pathinfo($file);
@@ -97,7 +99,7 @@ class AutoProvider {
 	 */
 	protected function guessClassName($filename)
 	{
-		return $this->config->get('auto-provider.app_namespace') . '\\' . $this->getProviderFolder() . '\\' . $filename;
+		return $this->getAppNamespace() . '\\' . $this->getProviderFolder() . '\\' . $filename;
 	}
 
 	/**
@@ -191,6 +193,28 @@ class AutoProvider {
 		foreach ($providers as $provider) {
 			$this->app->register($this->createProvider($provider));
 		}
+	}
+
+	/**
+	 * Get the application namespace from the Composer file.
+	 * 
+	 * @return string
+	 *
+	 * @throws \RuntimeException
+	 */
+	protected function getAppNamespace()
+	{
+		$composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
+
+		foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path)
+		{
+			foreach ((array) $path as $pathChoice)
+			{
+				if (realpath(app_path()) == realpath(base_path().'/'.$pathChoice)) return $namespace;
+			}
+		}
+
+		throw new RuntimeException("Unable to detect application namespace.");
 	}
 
 }
