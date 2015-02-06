@@ -18,7 +18,7 @@ class AutoProviderServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//
+		(new AutoProvider($this->app, $this->app['config']))->run();
 	}
 
 }
