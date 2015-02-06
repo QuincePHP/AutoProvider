@@ -22,5 +22,5 @@
 			"Quince\\AutoProvider\\": "src"
 		}
 	},
-	"minimum-stability": "dev"
+	"minimum-stability": "stable"
 }
