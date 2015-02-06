@@ -7,7 +7,7 @@ Add auto-provider to your composer.json file:
 
 ```JSON
 "require": {
-  "artdarek/oauth-4-laravel": "dev-master"
+  "quince/auto-provider": "~0.1"
 }
 ```
 
