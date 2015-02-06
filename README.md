@@ -47,3 +47,4 @@ If you changed your application namespace by running `$ php artisan app:name You
 ## TODO
 
 + For now, service providers which is deffered, would not be automatically registered.
++ Write unit tests, *(I didn't have so much time to unit test, but I have tested it and it worked)*
