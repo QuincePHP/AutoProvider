@@ -56,17 +56,19 @@ class AutoProvider {
 	 */
 	protected function getProviders()
 	{
-		$files = scandir($this->config->get('auto-provider.providers_folder'));
+		if (!empty($folder = $this->config->get('auto-provider.providers_folder_path'))) {
+			$files = scandir($folder);
 
-		foreach ($files as $file) {
-			$fileInfo = pathinfo($file);
+			foreach ($files as $file) {
+				$fileInfo = pathinfo($file);
 
-			if ($fileInfo['extension'] == 'php') {
-				$this->addProvider($fileInfo['filename']);
+				if ($fileInfo['extension'] == 'php') {
+					$this->addProvider($fileInfo['filename']);
+				}
 			}
-		}
 
-		$this->addProvidersToManifest();
+			$this->addProvidersToManifest();
+		}
 
 		return $this->providers;
 	}
@@ -108,7 +110,7 @@ class AutoProvider {
 			'\\',
 			substr(
 				$this->config->get('auto-provider.providers_folder_path'),
-				strlen(app_path())
+				strlen(app_path()) + 1
 			)
 		);
 
