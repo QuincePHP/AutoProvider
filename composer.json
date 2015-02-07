@@ -4,7 +4,9 @@
 	"keywords": [
 		"laravel",
 		"service provider",
-		"autoload"
+		"autoload",
+		"laravel 5",
+		"auto provider"
 	],
 	"license": "MIT",
 	"authors": [
