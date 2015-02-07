@@ -20,9 +20,7 @@ class AutoProviderServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		(new AutoProvider(
-			$this->app,
-			$this->app['config'],
-			new Filesystem()
+			$this->app, $this->app['config'], new Filesystem()
 		))->run();
 	}
 

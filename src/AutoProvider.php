@@ -57,8 +57,7 @@ class AutoProvider {
 	protected function getProviders()
 	{
 		if (!empty($folder = $this->config->get('auto-provider.providers_folder_path'))) {
-
-			//List of all files in directory
+			// List of all files in directory
 			$files = $this->file->files($folder);
 
 			foreach ($files as $file) {
@@ -99,13 +98,15 @@ class AutoProvider {
 	 */
 	protected function guessClassName($filename)
 	{
-		return $this->getAppNamespace() . '\\' . $this->getProviderFolder() . '\\' . $filename;
+		return $this->getAppNamespace() . '\\' . $this->getProviderFolderName() . '\\' . $filename;
 	}
 
 	/**
+	 * Get the providers folder name
+	 *
 	 * @return mixed
 	 */
-	protected function getProviderFolder()
+	protected function getProviderFolderName()
 	{
 		$folder = str_replace(
 			'/',
@@ -120,27 +121,33 @@ class AutoProvider {
 	}
 
 	/**
-	 * @param $className
+	 * Check if the provider class is addable
+	 *
+	 * @param $provider
 	 * @return bool
 	 */
-	protected function isAddable($className)
+	protected function isAddable($provider)
 	{
-		return !$this->alreadyLoaded($className) && !$this->createProvider($className)->isDeferred();
+		return !$this->isAlreadyLoaded($provider) && !$this->createProvider($provider)->isDeferred();
 	}
 
 	/**
-	 * @param $className
+	 * check if the provider is already loaded in manifest
+	 *
+	 * @param $provider
 	 * @return bool
 	 */
-	protected function alreadyLoaded($className)
+	protected function isAlreadyLoaded($provider)
 	{
 		$manifest = $this->loadManifest();
 
-		return (in_array($className, $manifest['providers']));
+		return (in_array($provider, $manifest['providers']));
 	}
 
 	/**
-	 * @return mixed
+	 * Load and return manifest data
+	 *
+	 * @return string
 	 */
 	protected function loadManifest()
 	{
@@ -154,6 +161,8 @@ class AutoProvider {
 	}
 
 	/**
+	 * Get the path to laravel manifest
+	 *
 	 * @return string
 	 */
 	protected function getManifestPath()
@@ -162,6 +171,8 @@ class AutoProvider {
 	}
 
 	/**
+	 * Create an instance of the provider
+	 *
 	 * @param $provider
 	 * @return ServiceProvider
 	 */
@@ -172,6 +183,8 @@ class AutoProvider {
 
 	/**
 	 * Overwrite old manifest with new manifest
+	 *
+	 * @return void
 	 */
 	protected function addProvidersToManifest()
 	{
@@ -186,6 +199,8 @@ class AutoProvider {
 	}
 
 	/**
+	 * Register providers to laravel's application container
+	 *
 	 * @param $providers
 	 */
 	protected function registerProviders($providers)
@@ -197,24 +212,23 @@ class AutoProvider {
 
 	/**
 	 * Get the application namespace from the Composer file.
-	 * 
-	 * @return string
 	 *
+	 * @return string
 	 * @throws \RuntimeException
 	 */
 	protected function getAppNamespace()
 	{
-		$composer = json_decode(file_get_contents(base_path().'/composer.json'), true);
+		$composer = json_decode(file_get_contents(base_path() . '/composer.json'), true);
 
-		foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path)
-		{
-			foreach ((array) $path as $pathChoice)
-			{
-				if (realpath(app_path()) == realpath(base_path().'/'.$pathChoice)) return $namespace;
+		foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+			foreach ((array) $path as $pathChoice) {
+				if (realpath(app_path()) == realpath(base_path() . '/' . $pathChoice)) {
+					return $namespace;
+				}
 			}
 		}
 
-		throw new RuntimeException("Unable to detect application namespace.");
+		throw new \RuntimeException("Unable to detect application namespace.");
 	}
 
 }
