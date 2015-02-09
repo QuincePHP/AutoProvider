@@ -29,14 +29,12 @@ class AutoProvider {
 
 	/**
 	 * @param Application $app
-	 * @param Repository  $config
-	 * @param Filesystem  $file
 	 */
-	public function __construct(Application $app, Repository $config, Filesystem $file)
+	public function __construct(Application $app)
 	{
 		$this->app = $app;
-		$this->config = $config;
-		$this->file = $file;
+		$this->config = $app['config'];
+		$this->file = $app['file']; 
 	}
 
 	/**
