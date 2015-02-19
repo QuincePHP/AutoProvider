@@ -28,6 +28,16 @@ class AutoProvider {
 	protected $file;
 
 	/**
+	 * @var string
+	 */
+	protected $appNamespace;
+
+	/**
+	 * @var string
+	 */
+	protected $providersFolder;
+
+	/**
 	 * @param Application $app
 	 */
 	public function __construct(Application $app)
@@ -106,7 +116,11 @@ class AutoProvider {
 	 */
 	protected function getProviderFolderName()
 	{
-		$folder = str_replace(
+		if (!is_null($this->providersFolder)) {
+			return $this->providersFolder;
+		}
+
+		$this->providersFolder = str_replace(
 			'/',
 			'\\',
 			substr(
@@ -115,7 +129,7 @@ class AutoProvider {
 			)
 		);
 
-		return $folder;
+		return $this->providersFolder;
 	}
 
 	/**
@@ -216,12 +230,16 @@ class AutoProvider {
 	 */
 	protected function getAppNamespace()
 	{
+		if (!is_null($this->appNamespace)) {
+			return $this->appNamespace;
+		}
+
 		$composer = json_decode(file_get_contents(base_path() . '/composer.json'), true);
 
 		foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
 			foreach ((array) $path as $pathChoice) {
 				if (realpath(app_path()) == realpath(base_path() . '/' . $pathChoice)) {
-					return $namespace;
+					return $this->appNamespace = rtrim($namespace, '\\');
 				}
 			}
 		}
